@@ -103,5 +103,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Changelog
 
-Changelog:
-- July 02, 2025. Initial setup
+- July 02, 2025: Initial portfolio setup with hybrid terminal/modern web design
+- July 02, 2025: Added GitHub deployment documentation and configuration files
+- July 02, 2025: Implemented interactive terminal with security commands, dark/light themes, matrix effects
+- July 02, 2025: Created deployment guides for Vercel, Railway, and custom domain setup
