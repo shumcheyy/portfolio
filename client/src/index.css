@@ -105,12 +105,14 @@
     height: 5vh;
   }
   
-  .content-terminal-expanded {
-    height: 70vh;
-  }
-  
-  .content-terminal-minimized {
-    height: 95vh;
+  .terminal-output-entry {
+    background: rgba(30, 41, 59, 0.7); /* subtle dark bg */
+    border-left: 4px solid var(--terminal-green);
+    padding: 0.5rem 1rem;
+    margin-top: 0.25rem;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    color: var(--terminal-green);
   }
   
   .matrix-rain {
@@ -138,9 +140,6 @@
   @media (max-width: 768px) {
     .terminal-expanded {
       height: 40vh;
-    }
-    .content-terminal-expanded {
-      height: 60vh;
     }
   }
 }

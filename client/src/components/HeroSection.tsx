@@ -1,16 +1,20 @@
 import { ShieldQuestion, MapPin, Mail, Phone } from 'lucide-react';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 
+// This component shows the 'About Me' section at the top of the portfolio.
+// It gives a quick summary of who you are and your security background.
 export function HeroSection() {
   return (
     <section id="about" className="animate-fadeIn">
       <div className="glassmorphism rounded-2xl p-8">
         <div className="flex items-center space-x-3 mb-6">
+          {/* Shield icon and section title */}
           <ShieldQuestion className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">About Me</h2>
         </div>
         <div className="grid md:grid-cols-2 gap-8">
           <div>
+            {/* Short professional summary */}
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
               Security Professional with 3+ years of expertise in Network, Cloud and Web Application Security. 
               Adept at uncovering critical security flaws through manual and automated techniques across diverse IT environments.
@@ -35,7 +39,7 @@ export function HeroSection() {
             </div>
             <div className="flex space-x-4 mt-6">
               <a 
-                href="https://linkedin.com/in/shubham-choubey" 
+                href="https://www.linkedin.com/in/shuhey"
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
@@ -43,7 +47,7 @@ export function HeroSection() {
                 <FaLinkedin className="w-6 h-6" />
               </a>
               <a 
-                href="https://github.com/shubham-choubey" 
+                href="https://github.com/shumcheyy"
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"

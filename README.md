@@ -146,3 +146,25 @@ MIT License - feel free to use this for your own portfolio!
 ## Support
 
 For issues or questions about deployment, create an issue in the GitHub repository.
+
+## Go Backend Migration
+
+### Running the Go Backend (Development)
+1. Build the frontend as usual with Vite (`npm run dev` for development, `npm run build` for production).
+2. Start the Go backend:
+   ```sh
+   cd go-server
+   go run main.go
+   ```
+   The Go server will listen on port 5000 and serve API endpoints at `/api`.
+3. During development, Vite will proxy `/api` requests to the Go backend (see `vite.config.ts`).
+
+### Production
+- Build the frontend with Vite (`npm run build`).
+- Copy the build output (usually `dist/public`) to the Go server's static directory (default: `./public`).
+- Start the Go server (`go run main.go` or build a binary).
+- The Go server will serve both the static frontend and API on port 5000.
+
+### Containerization
+- The Go server is ready for containerization. Use environment variables `PORT` and `STATIC_DIR` to configure the server.
+- Example Dockerfile and instructions can be added as needed.

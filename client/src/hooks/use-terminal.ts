@@ -7,17 +7,24 @@ export interface TerminalEntry {
   timestamp: Date;
 }
 
+// PROMPT is the text shown before each command, like in a real terminal.
+const PROMPT = "shubham@security";
+
+// This custom hook manages the state and logic for the terminal window.
+// It keeps track of command history, output, and provides functions to interact with the terminal.
 export const useTerminal = (
-  scrollToSection: (id: string) => void,
-  toggleTheme: () => void,
-  toggleMatrix: () => void,
-  downloadResume: () => void
+  scrollToSection: (id: string) => void, // Function to scroll to a section of the page
+  toggleTheme: () => void, // Function to switch between dark/light mode
+  toggleMatrix: () => void, // Function to toggle the Matrix rain effect
+  downloadResume: () => void // Function to download the resume
 ) => {
+  // entries: all the lines (commands and outputs) shown in the terminal
   const [entries, setEntries] = useState<TerminalEntry[]>([
     {
       type: 'output',
+      // This is the first message shown in the terminal when the page loads
       content: `<div class="flex items-center">
-        <span class="terminal-amber">shubham@security-pro</span>
+        <span class="terminal-amber">${PROMPT}</span>
         <span class="text-white">:</span>
         <span class="terminal-blue">~</span>
         <span class="text-white">$ </span>
@@ -31,13 +38,17 @@ export const useTerminal = (
     }
   ]);
   
+  // commandHistory: stores all commands the user has typed
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  // historyIndex: used to navigate command history with up/down arrows
   const [historyIndex, setHistoryIndex] = useState(-1);
 
+  // Clears all terminal output
   const clearTerminal = useCallback(() => {
     setEntries([]);
   }, []);
 
+  // Shows the command history as output
   const showHistory = useCallback(() => {
     if (commandHistory.length === 0) {
       return '<span class="text-gray-400">No command history available.</span>';
@@ -45,6 +56,7 @@ export const useTerminal = (
     return `<span class="terminal-green">Command History:</span>\n${commandHistory.map((cmd, i) => `${i + 1}. ${cmd}`).join('\n')}`;
   }, [commandHistory]);
 
+  // createTerminalCommands returns all available terminal commands
   const commands = createTerminalCommands(
     scrollToSection,
     toggleTheme,
@@ -54,57 +66,36 @@ export const useTerminal = (
     showHistory
   );
 
-  const executeCommand = useCallback((input: string) => {
-    const command = input.trim().toLowerCase();
-    
-    // Add command to entries
-    setEntries(prev => [...prev, {
-      type: 'command',
-      content: command,
-      timestamp: new Date()
-    }]);
-
-    // Add to history
-    if (command && !commandHistory.includes(command)) {
-      setCommandHistory(prev => [...prev, command]);
-    }
+  // Executes a command typed by the user
+  const executeCommand = (input: string) => {
+    const trimmed = input.trim();
+    if (!trimmed) return;
+    // Add the command to the terminal entries
+    setEntries((prev) => [
+      ...prev,
+      { type: 'command', content: trimmed, timestamp: new Date() },
+      // Add the output from the command
+      { type: 'output', content: commands[trimmed]?.execute() ?? `<span class="terminal-red">Command not found: ${trimmed}</span>`, timestamp: new Date() }
+    ]);
+    // Add the command to history
+    setCommandHistory((prev) => [...prev, trimmed]);
     setHistoryIndex(-1);
+  };
 
-    // Execute command
-    if (commands[command]) {
-      const output = commands[command].execute();
-      if (output) {
-        setEntries(prev => [...prev, {
-          type: 'output',
-          content: output,
-          timestamp: new Date()
-        }]);
-      }
-    } else if (command) {
-      setEntries(prev => [...prev, {
-        type: 'output',
-        content: `<span class="terminal-red">Command not found: ${command}</span>\nType <span class="terminal-amber">'help'</span> for available commands.`,
-        timestamp: new Date()
-      }]);
+  // Lets user navigate command history with up/down arrows
+  const navigateHistory = (direction: 'up' | 'down') => {
+    if (commandHistory.length === 0) return null;
+    let newIndex = historyIndex;
+    if (direction === 'up') {
+      newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
+    } else {
+      newIndex = historyIndex === -1 ? -1 : Math.min(commandHistory.length - 1, historyIndex + 1);
     }
-  }, [commands, commandHistory]);
+    setHistoryIndex(newIndex);
+    return newIndex === -1 ? '' : commandHistory[newIndex];
+  };
 
-  const navigateHistory = useCallback((direction: 'up' | 'down') => {
-    if (direction === 'up' && historyIndex < commandHistory.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      return commandHistory[commandHistory.length - 1 - newIndex];
-    } else if (direction === 'down' && historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      return commandHistory[commandHistory.length - 1 - newIndex];
-    } else if (direction === 'down' && historyIndex === 0) {
-      setHistoryIndex(-1);
-      return '';
-    }
-    return null;
-  }, [commandHistory, historyIndex]);
-
+  // Return everything needed for the terminal component
   return {
     entries,
     executeCommand,

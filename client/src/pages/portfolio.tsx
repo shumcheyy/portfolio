@@ -11,11 +11,16 @@ import { ProjectsGrid } from '@/components/ProjectsGrid';
 import { ContactForm } from '@/components/ContactForm';
 import { useTheme } from '@/components/ThemeProvider';
 
+// This is the main page for the portfolio. It puts together the terminal, navigation, and all the main content sections.
 export default function Portfolio() {
+  // State to track if the terminal is minimized (small bar) or open
   const [isTerminalMinimized, setIsTerminalMinimized] = useState(false);
+  // State to track if the Matrix rain effect is active
   const [isMatrixActive, setIsMatrixActive] = useState(false);
+  // Get the current theme and a function to toggle it
   const { theme, toggleTheme } = useTheme();
 
+  // This function scrolls to a section of the page by its id
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -23,14 +28,17 @@ export default function Portfolio() {
     }
   };
 
+  // This toggles the terminal between minimized and open
   const toggleTerminalMinimize = () => {
     setIsTerminalMinimized(!isTerminalMinimized);
   };
 
+  // This toggles the Matrix rain effect
   const toggleMatrix = () => {
     setIsMatrixActive(!isMatrixActive);
   };
 
+  // This triggers a download of the resume PDF
   const downloadResume = () => {
     // Create a temporary link to trigger download
     // In a real implementation, this would point to an actual PDF file
@@ -42,7 +50,7 @@ export default function Portfolio() {
     document.body.removeChild(link);
   };
 
-  // Keyboard shortcut for terminal toggle
+  // Keyboard shortcut: Ctrl + ` toggles the terminal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === '`') {
@@ -55,15 +63,16 @@ export default function Portfolio() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // The layout uses flex column: terminal at the top, content below
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 font-sans flex flex-col">
       <title>Shubham Choubey - Security Professional | Portfolio</title>
       <meta name="description" content="Security Professional with 3+ years expertise in Network, Cloud and Web Application Security. Available for freelance security consulting." />
       
-      {/* Matrix Rain Effect */}
+      {/* Matrix Rain Effect overlays the page if active */}
       <MatrixRain isActive={isMatrixActive} />
       
-      {/* Terminal Section */}
+      {/* Terminal Section at the top */}
       <Terminal
         isMinimized={isTerminalMinimized}
         onToggleMinimize={toggleTerminalMinimize}
@@ -74,17 +83,16 @@ export default function Portfolio() {
         isDark={theme === 'dark'}
       />
       
-      {/* Modern Navigation (shown when terminal minimized) */}
+      {/* Modern Navigation bar, only shown when terminal is minimized */}
       <ModernNav 
         isVisible={isTerminalMinimized} 
         onScrollToSection={scrollToSection}
       />
       
-      {/* Main Content Area */}
-      <div className={`overflow-y-auto transition-all duration-500 ease-in-out ${
-        isTerminalMinimized ? 'content-terminal-minimized' : 'content-terminal-expanded'
-      }`}>
+      {/* Main Content Area: grows to fill the rest of the page */}
+      <div className="flex-grow overflow-y-auto transition-all duration-500 ease-in-out">
         <div className="container mx-auto px-4 py-8 space-y-12">
+          {/* Each section is a separate component */}
           <HeroSection />
           <ExperienceTimeline />
           <SkillsGrid />
@@ -93,7 +101,7 @@ export default function Portfolio() {
         </div>
       </div>
       
-      {/* Resume Download Button */}
+      {/* Resume Download Button: fixed in the bottom right corner */}
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={downloadResume}

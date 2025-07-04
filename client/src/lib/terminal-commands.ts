@@ -1,16 +1,22 @@
+// This file defines all the commands you can type in the terminal window.
+// Each command has a name, description, and what it does (execute function).
+// To add a new command, just add a new entry to the object below.
+
 export interface TerminalCommand {
-  name: string;
-  description: string;
-  execute: () => string;
+  name: string; // The command name (what you type)
+  description: string; // What the command does
+  execute: () => string; // What happens when you run the command
 }
 
+// This function creates all the available terminal commands.
+// You can add, remove, or change commands here.
 export const createTerminalCommands = (
-  scrollToSection: (id: string) => void,
-  toggleTheme: () => void,
-  toggleMatrix: () => void,
-  downloadResume: () => void,
-  clearTerminal: () => void,
-  showHistory: () => string
+  scrollToSection: (id: string) => void, // Scrolls to a section of the page
+  toggleTheme: () => void, // Switches between dark/light mode
+  toggleMatrix: () => void, // Toggles the Matrix rain effect
+  downloadResume: () => void, // Downloads the resume
+  clearTerminal: () => void, // Clears the terminal output
+  showHistory: () => string // Shows the command history
 ): Record<string, TerminalCommand> => ({
   help: {
     name: 'help',
@@ -28,10 +34,11 @@ export const createTerminalCommands = (
 <span class="terminal-amber">clear</span>      - Clear terminal
 <span class="terminal-amber">history</span>    - Show command history
 
-<span class="terminal-green">Security Easter Eggs:</span>
-<span class="terminal-amber">scan</span>       - Run network scan
-<span class="terminal-amber">exploit</span>    - Check for vulnerabilities
-<span class="terminal-amber">secure</span>     - Secure the system`
+<span class="terminal-green">Security Resources:</span>
+<span class="terminal-amber">owasp</span>      - OWASP Top 10
+<span class="terminal-amber">k8s</span>        - Kubernetes Security Best Practices
+<span class="terminal-amber">supplychain</span> - Supply Chain Security
+<span class="terminal-amber">quiz</span>       - Security Quiz (coming soon)`
   },
 
   about: {
@@ -167,38 +174,27 @@ Type <span class="terminal-amber">'help'</span> for available commands.`
     }
   },
 
-  // Security Easter Eggs
-  scan: {
-    name: 'scan',
-    description: 'Run network scan',
-    execute: () => `<span class="terminal-green">Starting Nmap scan...</span>
-<span class="text-gray-400">TARGET: localhost</span>
-<span class="text-gray-400">Starting Nmap 7.93 ( https://nmap.org )</span>
-<span class="terminal-green">PORT     STATE    SERVICE</span>
-<span class="text-white">22/tcp   open     ssh</span>
-<span class="text-white">80/tcp   open     http</span>
-<span class="text-white">443/tcp  open     https</span>
-<span class="terminal-amber">Scan completed successfully!</span>`
+  owasp: {
+    name: 'owasp',
+    description: 'OWASP Top 10',
+    execute: () => `<span class="terminal-green">OWASP Top 10:</span> <a href="https://owasp.org/www-project-top-ten/" target="_blank" class="underline text-blue-400">https://owasp.org/www-project-top-ten/</a>`
   },
 
-  exploit: {
-    name: 'exploit',
-    description: 'Check for vulnerabilities',
-    execute: () => `<span class="terminal-green">Running vulnerability scan...</span>
-<span class="text-gray-400">Checking for common vulnerabilities...</span>
-<span class="terminal-red">CRITICAL: SQL Injection detected!</span>
-<span class="terminal-amber">HIGH: XSS vulnerability found!</span>
-<span class="text-white">MEDIUM: Outdated SSL certificate</span>
-<span class="terminal-green">Scan complete. Contact me for remediation!</span>`
+  k8s: {
+    name: 'k8s',
+    description: 'Kubernetes Security Best Practices',
+    execute: () => `<span class="terminal-green">Kubernetes Security Best Practices:</span> <a href="https://kubernetes.io/docs/concepts/security/overview/" target="_blank" class="underline text-blue-400">https://kubernetes.io/docs/concepts/security/overview/</a>`
   },
 
-  secure: {
-    name: 'secure',
-    description: 'Secure the system',
-    execute: () => `<span class="terminal-green">Initiating security protocols...</span>
-<span class="text-gray-400">Applying security patches...</span>
-<span class="text-gray-400">Updating firewall rules...</span>
-<span class="text-gray-400">Configuring intrusion detection...</span>
-<span class="terminal-green">System secured! All vulnerabilities patched.</span>`
+  supplychain: {
+    name: 'supplychain',
+    description: 'Supply Chain Security',
+    execute: () => `<span class="terminal-green">Supply Chain Security:</span> <a href="https://slsa.dev/" target="_blank" class="underline text-blue-400">https://slsa.dev/</a>`
+  },
+
+  quiz: {
+    name: 'quiz',
+    description: 'Security Quiz (coming soon)',
+    execute: () => `<span class="terminal-green">Security Quiz coming soon! Stay tuned.</span>`
   }
 });
