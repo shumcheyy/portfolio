@@ -45,7 +45,7 @@ A modern, interactive terminal-style portfolio website showcasing security exper
    npm run dev
    ```
 
-5. **Visit** `http://localhost:5000`
+5. **Visit** `http://localhost:10000`
 
 ## Terminal Commands
 
@@ -73,7 +73,7 @@ Create a `.env` file with:
 ```
 DATABASE_URL=your_postgresql_connection_string
 NODE_ENV=production
-PORT=5000
+PORT=10000
 ```
 
 ### Build for Production
@@ -156,14 +156,14 @@ For issues or questions about deployment, create an issue in the GitHub reposito
    cd go-server
    go run main.go
    ```
-   The Go server will listen on port 5000 and serve API endpoints at `/api`.
+   The Go server will listen on port 10000 and serve API endpoints at `/api`.
 3. During development, Vite will proxy `/api` requests to the Go backend (see `vite.config.ts`).
 
 ### Production
 - Build the frontend with Vite (`npm run build`).
 - Copy the build output (usually `dist/public`) to the Go server's static directory (default: `./public`).
 - Start the Go server (`go run main.go` or build a binary).
-- The Go server will serve both the static frontend and API on port 5000.
+- The Go server will serve both the static frontend and API on port 10000.
 
 ### Containerization
 - The Go server is ready for containerization. Use environment variables `PORT` and `STATIC_DIR` to configure the server.

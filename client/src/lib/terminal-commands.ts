@@ -46,7 +46,7 @@ export const createTerminalCommands = (
     description: 'Learn about me',
     execute: () => {
       scrollToSection('about');
-      return `<span class="terminal-green">Security Professional | Penetration Tester | Cloud Security Expert</span>
+      return `<span class="terminal-green">Security Professional | Penetration Tester</span>
 
 I'm a passionate security professional with 3+ years of expertise in:
 • Network, Cloud and Web Application Security

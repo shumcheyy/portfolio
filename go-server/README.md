@@ -12,7 +12,7 @@ This is the Go backend for the ResumeTerminal project. It provides API endpoints
    ```sh
    go run main.go
    ```
-3. The server listens on port 5000 by default. Use the `PORT` environment variable to change it.
+3. The server listens on port 10000 by default. Use the `PORT` environment variable to change it.
 4. During development, Vite will proxy `/api` requests to this server.
 
 ## Production

@@ -84,7 +84,7 @@ Required for production:
 ```bash
 DATABASE_URL=postgresql://user:pass@host:port/db
 NODE_ENV=production
-PORT=5000
+PORT=10000
 ```
 
 ## Monitoring & Maintenance

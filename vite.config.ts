@@ -38,7 +38,7 @@ export default defineConfig({
       deny: ["**/.*"],
     },
     proxy: {
-      '/api': 'http://localhost:5000',
+      '/api': `http://localhost:${process.env.API_PORT || 10000}`,
     },
   },
 });

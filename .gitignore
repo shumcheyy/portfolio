@@ -86,3 +86,5 @@ temp/
 # Replit specific
 .replit
 replit.nix
+
+.gitignore

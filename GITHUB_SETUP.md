@@ -120,7 +120,7 @@ DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
 ```bash
 DATABASE_URL=your_production_database_url
 NODE_ENV=production
-PORT=5000
+PORT=10000
 ```
 
 ## Step 7: Custom Configuration

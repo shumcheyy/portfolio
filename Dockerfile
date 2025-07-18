@@ -36,8 +36,8 @@ FROM gcr.io/distroless/static-debian12 AS final
 WORKDIR /app
 COPY --from=builder /app/server .
 COPY --from=frontend /app/dist/public ./public
-ENV PORT=5000
+ENV PORT=10000
 ENV STATIC_DIR=./public
-EXPOSE 5000
+EXPOSE 10000
 USER 65532:65532
 CMD ["./server"]

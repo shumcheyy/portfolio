@@ -31,7 +31,7 @@ export const useTerminal = (
         <span class="terminal-green">whoami</span>
       </div>
       <div class="text-white ml-0">
-        <p>Security Professional | Penetration Tester | Cloud Security Expert</p>
+        <p>Security Professional | Penetration Tester</p>
         <p class="text-gray-400">Type 'help' for available commands</p>
       </div>`,
       timestamp: new Date()

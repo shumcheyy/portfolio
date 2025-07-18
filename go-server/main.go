@@ -54,14 +54,24 @@ func (s *contactStore) all() []Contact {
 var store = newContactStore()
 
 func main() {
-	port := getEnv("PORT", "5000")
+	port := getEnv("PORT", "10000")
 	staticDir := getEnv("STATIC_DIR", "./public")
 
 	http.HandleFunc("/api/contact", handleContact)
 	http.HandleFunc("/api/contacts", handleContacts)
 
-	// Serve static files
-	http.Handle("/", http.FileServer(http.Dir(staticDir)))
+	// Serve static files with SPA fallback
+	fs := http.FileServer(http.Dir(staticDir))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// Check if the requested file exists
+		if _, err := os.Stat(staticDir + r.URL.Path); os.IsNotExist(err) {
+			// If file doesn't exist, serve index.html (SPA fallback)
+			http.ServeFile(w, r, staticDir+"/index.html")
+			return
+		}
+		// Otherwise, serve the requested file
+		fs.ServeHTTP(w, r)
+	})
 
 	log.Printf("[go-server] Serving on 0.0.0.0:%s, static dir: %s", port, staticDir)
 	if err := http.ListenAndServe("0.0.0.0:"+port, nil); err != nil {
