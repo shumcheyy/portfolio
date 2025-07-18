@@ -23,7 +23,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "client", "src"),
-      "@shared": path.resolve(__dirname, "shared"),
       "@assets": path.resolve(__dirname, "attached_assets"),
     },
   },
@@ -38,7 +37,7 @@ export default defineConfig({
       deny: ["**/.*"],
     },
     proxy: {
-      '/api': `http://localhost:${process.env.API_PORT || 10000}`,
+      '/api': 'http://localhost:10000',
     },
   },
 });
