@@ -40,3 +40,6 @@ temp/
 # Replit specific (if using Replit)
 .replit
 replit.nix
+
+
+*.bat

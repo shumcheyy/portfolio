@@ -23,16 +23,22 @@ export const useTerminal = (
     {
       type: 'output',
       // This is the first message shown in the terminal when the page loads
-      content: `<div class="flex items-center">
-        <span class="terminal-amber">${PROMPT}</span>
-        <span class="text-white">:</span>
-        <span class="terminal-blue">~</span>
-        <span class="text-white">$ </span>
-        <span class="terminal-green">whoami</span>
-      </div>
-      <div class="text-white ml-0">
-        <p>Security Professional | Penetration Tester</p>
-        <p class="text-gray-400">Type 'help' for available commands</p>
+      content: `<div class="border-l-4 border-green-500 pl-4 mb-4">
+        <div class="flex items-center mb-2">
+          <span class="terminal-amber">${PROMPT}</span>
+          <span class="text-white">:</span>
+          <span class="terminal-blue">~</span>
+          <span class="text-white">$ </span>
+          <span class="terminal-green">whoami</span>
+        </div>
+        <div class="text-white ml-0">
+          <p class="text-lg">Security Professional | Penetration Tester</p>
+          <div class="mt-3 p-3 bg-gray-800 rounded border border-gray-600">
+            <p class="text-green-400 font-semibold"> Welcome to my interactive terminal!</p>
+            <p class="text-gray-300 mt-1">Type <span class="text-yellow-400 font-mono">'help'</span> to see all available commands</p>
+            <p class="text-gray-400 text-sm mt-1">Try: <span class="text-blue-400 font-mono">about</span>, <span class="text-blue-400 font-mono">skills</span>, <span class="text-blue-400 font-mono">projects</span>, or <span class="text-blue-400 font-mono">contact</span></p>
+          </div>
+        </div>
       </div>`,
       timestamp: new Date()
     }

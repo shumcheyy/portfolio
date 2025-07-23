@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTerminal } from '@/hooks/use-terminal';
-import { Moon, Sun, Code, Minus, Plus } from 'lucide-react';
+import { Moon, Sun, Code, Minus, Plus, Terminal as TerminalIcon } from 'lucide-react';
 
 interface TerminalProps {
   isMinimized: boolean;
@@ -122,8 +122,12 @@ export function Terminal({
   // Render the terminal window
   return (
     <div
-      className={`terminal-bg text-terminal-green font-mono relative overflow-hidden transition-all duration-500 ease-in-out ${isMinimized ? 'terminal-minimized' : ''}`}
+      className={`terminal-bg text-terminal-green font-mono relative overflow-hidden transition-all duration-500 ease-in-out ${
+        isMinimized ? 'terminal-minimized terminal-pulse' : ''
+      }`}
       style={!isMinimized ? { height: `${height}vh` } : {}}
+      onClick={isMinimized ? onToggleMinimize : undefined}
+      title={isMinimized ? "Click to open terminal (Ctrl + ` to toggle)" : undefined}
     >
       {/* Terminal Header: shows fake window controls and prompt */}
       <div className="flex items-center justify-between p-4 bg-gray-800 border-b border-gray-700">
@@ -132,8 +136,16 @@ export function Terminal({
           <div className="w-3 h-3 bg-red-500 rounded-full"></div>
           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-          {/* The prompt label */}
-          <span className="text-gray-300 text-sm ml-4">{PROMPT}:~$</span>
+          {/* Terminal icon and prompt label */}
+          <div className="flex items-center space-x-2 ml-4">
+            <TerminalIcon className="h-4 w-4 text-green-400" />
+            <span className="text-gray-300 text-sm">{PROMPT}:~$</span>
+            {isMinimized && (
+              <span className="text-green-400 text-xs ml-2 animate-pulse">
+                Click to open terminal
+              </span>
+            )}
+          </div>
         </div>
         {/* Terminal control buttons: theme, matrix, minimize */}
         <div className="flex items-center space-x-3">

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Terminal } from '@/components/Terminal';
 import { ModernNav } from '@/components/ModernNav';
 import { MatrixRain } from '@/components/MatrixRain';
+import { TerminalHint } from '@/components/TerminalHint';
 import { HeroSection } from '@/components/HeroSection';
 import { ExperienceTimeline } from '@/components/ExperienceTimeline';
 import { SkillsGrid } from '@/components/SkillsGrid';
@@ -14,7 +15,7 @@ import { useTheme } from '@/components/ThemeProvider';
 // This is the main page for the portfolio. It puts together the terminal, navigation, and all the main content sections.
 export default function Portfolio() {
   // State to track if the terminal is minimized (small bar) or open
-  const [isTerminalMinimized, setIsTerminalMinimized] = useState(false);
+  const [isTerminalMinimized, setIsTerminalMinimized] = useState(true);
   // State to track if the Matrix rain effect is active
   const [isMatrixActive, setIsMatrixActive] = useState(false);
   // Get the current theme and a function to toggle it
@@ -71,6 +72,9 @@ export default function Portfolio() {
       
       {/* Matrix Rain Effect overlays the page if active */}
       <MatrixRain isActive={isMatrixActive} />
+      
+      {/* Terminal hint for first-time visitors */}
+      <TerminalHint isTerminalMinimized={isTerminalMinimized} />
       
       {/* Terminal Section at the top */}
       <Terminal
