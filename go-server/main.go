@@ -83,8 +83,9 @@ func main() {
 			return
 		}
 
-		// Prevent path traversal: ensure resolved path is within static directory
-		if !strings.HasPrefix(absFullPath, absStaticDir) {
+		// Prevent path traversal: ensure resolved path is strictly within static directory
+		relPath, err := filepath.Rel(absStaticDir, absFullPath)
+		if err != nil || strings.HasPrefix(relPath, "..") {
 			http.Error(w, "Access denied", http.StatusForbidden)
 			return
 		}
