@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 )
@@ -60,17 +62,42 @@ func main() {
 	http.HandleFunc("/api/contact", handleContact)
 	http.HandleFunc("/api/contacts", handleContacts)
 
-	// Serve static files with SPA fallback
-	fs := http.FileServer(http.Dir(staticDir))
+	// Serve static files with SPA fallback (secure against path traversal)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Check if the requested file exists
-		if _, err := os.Stat(staticDir + r.URL.Path); os.IsNotExist(err) {
-			// If file doesn't exist, serve index.html (SPA fallback)
-			http.ServeFile(w, r, staticDir+"/index.html")
+		// Clean the path to remove any .. or . components
+		cleanPath := filepath.Clean(r.URL.Path)
+
+		// Build full path by joining staticDir with cleaned path
+		fullPath := filepath.Join(staticDir, cleanPath)
+
+		// Security check: ensure the resolved path is within staticDir
+		absStaticDir, err := filepath.Abs(staticDir)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-		// Otherwise, serve the requested file
-		fs.ServeHTTP(w, r)
+
+		absFullPath, err := filepath.Abs(fullPath)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		// Prevent path traversal: ensure resolved path is within static directory
+		if !strings.HasPrefix(absFullPath, absStaticDir) {
+			http.Error(w, "Access denied", http.StatusForbidden)
+			return
+		}
+
+		// Check if file exists
+		if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+			// SPA fallback: serve index.html for non-existent files
+			http.ServeFile(w, r, filepath.Join(staticDir, "index.html"))
+			return
+		}
+
+		// Serve the requested file
+		http.ServeFile(w, r, fullPath)
 	})
 
 	log.Printf("[go-server] Serving on 0.0.0.0:%s, static dir: %s", port, staticDir)
