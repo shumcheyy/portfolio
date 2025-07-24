@@ -14,7 +14,6 @@ permissions:
 
 env:
    NODE_VERSION: "20"
-   GO_VERSION: "1.24"
 
 jobs:
    quality-checks:
@@ -31,24 +30,16 @@ jobs:
               node-version: ${{ env.NODE_VERSION }}
               cache: "npm"
 
-         - name: Setup Go
-           uses: actions/setup-go@v4
-           with:
-              go-version: ${{ env.GO_VERSION }}
-              cache: true
-
          - name: Install dependencies
            run: npm install
-
- #        - name: Tidy Go modules
- #          run: |
- #             cd go-server
- #             go mod tidy
 
          - name: Initialize CodeQL
            uses: github/codeql-action/init@v3
            with:
               languages: javascript, go
+
+         - name: Autobuild
+           uses: github/codeql-action/autobuild@v3
 
          - name: Run npm audit
            run: npm audit --audit-level=moderate --json > npm-audit.json || true
@@ -79,32 +70,17 @@ jobs:
               node-version: ${{ env.NODE_VERSION }}
               cache: "npm"
 
-         - name: Setup Go
-           uses: actions/setup-go@v4
-           with:
-              go-version: ${{ env.GO_VERSION }}
-              cache: true
-
          - name: Install dependencies
            run: npm install
 
          - name: Build React frontend
            run: npm run build
 
-         - name: Build Go server
-           run: |
-              cd go-server
-              go build -o server main.go
- #            go mod tidy
-              
-
          - name: Upload build artifacts
            uses: actions/upload-artifact@v4
            with:
               name: build-artifacts
-              path: |
-                 dist/
-                 go-server/server
+              path: dist/
               retention-days: 7
 
    container-security:
