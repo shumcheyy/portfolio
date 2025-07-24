@@ -1,0 +1,96 @@
+# Setup of the workflow
+name: CI/CD Pipeline
+on:
+   push:
+      branches: [main]
+   pull_request:
+      branches: [main]
+   workflow_dispatch:
+env:
+   NODE_VERSION: '20'
+   GO_VERSION: '1.24'
+
+
+# First Job, Security and Quality
+
+jobs:
+   security-quality-checks:
+      name: Security and Quality Checks
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with: 
+         node-version: ${{ env.NODE_VERSION }}
+         cache: 'npm'
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with: 
+            go-version: ${{ env.GO_VERSION }}
+            cache: true
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Code formatting check
+        run: npm run check || echo "Add prettier check to package.json"
+
+      - name: Lint Code
+        run: npm run lint || echo "Add ESLint to package.json"
+
+
+# Security Scanning using CodeQl and Semgrep
+
+      # Analyzing first using CodeQl and Semgrep
+      - name: Init CodeQl
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, go
+
+      - name: Run CodeQl Analysis
+        uses: github/codeql-action/analyze@v3
+
+      - name: Run Semgrep Security Scanning
+        uses: actions/semgrep-action@v1
+        with: 
+           config: >-
+             p/security-audit
+             p/secrets
+             p/owasp-top-ten
+             p/javascript
+             p/typescript
+             p/go
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Run npm audit (JSON output)
+        run: npm audit --audit-level=high --json > npm-audit.json || true
+        # Above || true -> Prevents pipeline failure on vulns 
+
+      # Uploading Codeql results
+
+      - name: Upload security scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            npm-audit.json
+
+
+
+
+
+
+
+
+
+
+
+
+# Second Job, Build and Test
