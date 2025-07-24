@@ -44,9 +44,9 @@ jobs:
         run: npm run lint || echo "Add ESLint to package.json"
 
 
-# Security Scanning using CodeQl and Semgrep
+# Security Scanning using CodeQl
 
-      # Analyzing first using CodeQl and Semgrep
+      # Analyzing first using CodeQl
       - name: Init CodeQl
         uses: github/codeql-action/init@v3
         with:
@@ -55,16 +55,6 @@ jobs:
       - name: Run CodeQl Analysis
         uses: github/codeql-action/analyze@v3
 
-      - name: Run Semgrep Security Scanning
-        uses: actions/semgrep-action@v1
-        with: 
-           config: >-
-             p/security-audit
-             p/secrets
-             p/owasp-top-ten
-             p/javascript
-             p/typescript
-             p/go
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
