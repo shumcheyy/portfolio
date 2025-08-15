@@ -13,8 +13,7 @@
     # Build the frontend using npm build
     
     WORKDIR /app/client
-    RUN npm install
-    RUN npm run build
+    RUN npm install && npm run build
     
     # --- Go build stage ---
     FROM golang:1.24-alpine AS builder
@@ -23,7 +22,7 @@
     RUN go build -o server main.go
     
     # --- Final image ---
-    FROM gcr.io/distroless/static-debian12 AS final
+    FROM gcr.io/distroless/static-debian12:latest AS final
     WORKDIR /app
     COPY --from=builder /app/server .
     COPY --from=frontend /app/dist/public ./public
