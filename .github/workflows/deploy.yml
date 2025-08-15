@@ -1,0 +1,69 @@
+name: Deploy Portfolio to Production
+
+on:
+  workflow_run:
+    workflows: ["never"]
+    #workflows: ["Security CI/CD Pipeline"]
+    types: [completed]
+    branches: [never]
+  workflow_dispatch: # Manual trigger
+
+env:
+  RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    # Only deploy if the pipeline workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Download the pre-built, security-scanned Docker image from pipeline
+      - name: Download Docker image from pipeline
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-${{ github.event.workflow_run.head_sha }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Load Docker image
+        run: |
+          docker load < portfolio-image.tar.gz
+          docker tag portfolio:latest ${{ secrets.DOCKERHUB_USERNAME }}/portfolio:${{ github.event.workflow_run.head_sha }}
+          docker tag portfolio:latest ${{ secrets.DOCKERHUB_USERNAME }}/portfolio:latest
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push security-scanned image to Docker Hub
+        run: |
+          echo "Pushing pre-built, security-scanned image..."
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/portfolio:${{ github.event.workflow_run.head_sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/portfolio:latest
+
+      - name: Trigger Render deployment
+        run: |
+          echo "Triggering Render deployment..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK_URL")
+          if [ $response -eq 200 ] || [ $response -eq 201 ]; then
+            echo "✅ Render deployment triggered successfully"
+          else
+            echo "❌ Render deployment failed with status: $response"
+            exit 1
+          fi
+
+      - name: Deployment summary
+        run: |
+          echo "🚀 Deployment Summary:"
+          echo "- Commit: ${{ github.event.workflow_run.head_sha }}"
+          echo "- Image: ${{ secrets.DOCKERHUB_USERNAME }}/portfolio:latest"
+          echo "- Status: Deployed to Render"
+          echo "- Security: ✅ Passed all scans"

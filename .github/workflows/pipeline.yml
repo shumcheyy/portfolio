@@ -1,146 +1,120 @@
-name: CI/CD Pipeline
+name: Security CI/CD Pipeline
 
 on:
-   push:
-      branches: [main]
-   pull_request:
-      branches: [main]
-   workflow_dispatch:
+  push:
+    branches: [never]
+  pull_request:
+    branches: [never]
+  #workflow_dispatch:
 
 permissions:
-   contents: read
-   security-events: write
-   actions: read
+  contents: read
+  security-events: write
+  actions: read
 
 env:
-   NODE_VERSION: "20"
+  NODE_VERSION: "20"
+  GO_VERSION: "1.25"
 
 jobs:
-   quality-checks:
-      name: Code Quality & Security
-      runs-on: ubuntu-latest
+  # Single comprehensive job that handles everything efficiently
+  security-build-scan:
+    name: Security, Build & Container Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      # === SETUP PHASE ===
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      steps:
-         - name: Checkout code
-           uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
 
-         - name: Setup Node.js
-           uses: actions/setup-node@v4
-           with:
-              node-version: ${{ env.NODE_VERSION }}
-              cache: "npm"
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
 
-         - name: Install dependencies
-           run: npm install
+      # === DEPENDENCY & SECURITY PHASE ===
+      - name: Install Node.js dependencies
+        run: npm install
 
-         - name: Initialize CodeQL
-           uses: github/codeql-action/init@v3
-           with:
-              languages: javascript, go
+      - name: Run npm security audit
+        run: |
+          npm audit --audit-level=moderate --json > npm-audit.json || true
+          if [ -s npm-audit.json ]; then
+            echo "::warning::npm audit found vulnerabilities"
+            cat npm-audit.json
+          fi
 
-         - name: Autobuild
-           uses: github/codeql-action/autobuild@v3
+      - name: Initialize CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, go
+          queries: security-extended
 
-         - name: Run npm audit
-           run: npm audit --audit-level=moderate --json > npm-audit.json || true
+      # === BUILD & TEST PHASE ===
+      - name: Build frontend (for testing)
+        run: npm run build
 
-         - name: Run CodeQL Analysis
-           uses: github/codeql-action/analyze@v3
+      - name: Build Go server (for testing)
+        working-directory: go-server
+        run: go build -v ./...
 
-         - name: Upload security reports
-           uses: actions/upload-artifact@v4
-           if: always()
-           with:
-              name: security-reports
-              path: npm-audit.json
-              retention-days: 30
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
 
-   build-and-test:
-      name: Build & Test
-      runs-on: ubuntu-latest
-      needs: quality-checks
+      # === CONTAINER SECURITY PHASE ===
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: error
 
-      steps:
-         - name: Checkout code
-           uses: actions/checkout@v4
+      - name: Build Docker image
+        run: |
+          docker build -t portfolio:${{ github.sha }} .
+          docker tag portfolio:${{ github.sha }} portfolio:latest
 
-         - name: Setup Node.js
-           uses: actions/setup-node@v4
-           with:
-              node-version: ${{ env.NODE_VERSION }}
-              cache: "npm"
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "portfolio:latest"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1"  # Fail on vulnerabilities
 
-         - name: Install dependencies
-           run: npm install
+      - name: Upload Trivy scan results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-results.sarif"
 
-         - name: Build React frontend
-           run: npm run build
+      # === ARTIFACT STORAGE ===
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports-${{ github.sha }}
+          path: |
+            npm-audit.json
+            trivy-results.sarif
+          retention-days: 30
 
-         - name: Upload build artifacts
-           uses: actions/upload-artifact@v4
-           with:
-              name: build-artifacts
-              path: dist/
-              retention-days: 7
+      - name: Upload Docker image (for deploy workflow)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker save portfolio:latest | gzip > portfolio-image.tar.gz
 
-   container-security:
-      name: Container Security
-      runs-on: ubuntu-latest
-      needs: build-and-test
-
-      steps:
-         - name: Checkout code
-           uses: actions/checkout@v4
-
-         - name: Download build artifacts
-           uses: actions/download-artifact@v4
-           with:
-              name: build-artifacts
-
-         - name: Lint Dockerfile
-           uses: hadolint/hadolint-action@v3.1.0
-           with:
-              dockerfile: Dockerfile
-
-         - name: Build Docker image
-           run: |
-              docker build -t portfolio:${{ github.sha }} .
-              docker tag portfolio:${{ github.sha }} portfolio:latest
-
-         - name: Run Trivy vulnerability scanner
-           uses: aquasecurity/trivy-action@master
-           with:
-              image-ref: "portfolio:latest"
-              format: "sarif"
-              output: "trivy-results.sarif"
-
-         - name: Upload Trivy scan results
-           uses: github/codeql-action/upload-sarif@v3
-           if: always()
-           with:
-              sarif_file: "trivy-results.sarif"
-
-   deploy:
-      name: Deploy
-      runs-on: ubuntu-latest
-      needs: container-security
-      if: github.ref == 'refs/heads/main'
-
-      steps:
-         - name: Checkout code
-           uses: actions/checkout@v4
-
-         - name: Download build artifacts
-           uses: actions/download-artifact@v4
-           with:
-              name: build-artifacts
-
-         - name: Build final Docker image
-           run: |
-              docker build -t portfolio:${{ github.sha }} .
-
-         - name: Deploy notification
-           run: |
-              echo "🚀 Deployment successful!"
-              echo "Image: portfolio:${{ github.sha }}"
-              echo "Commit: ${{ github.sha }}"
+      - name: Upload Docker image artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-${{ github.sha }}
+          path: portfolio-image.tar.gz
+          retention-days: 1  # Only needed for deployment

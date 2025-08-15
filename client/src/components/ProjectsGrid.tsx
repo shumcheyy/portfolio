@@ -7,12 +7,20 @@ import { Badge } from '@/components/ui/badge';
 export function ProjectsGrid() {
   const projects = [
     {
-      title: 'Cloud Security Automation',
+      title: 'Devsecops Portfolio Platform',
       description: 'Designed and implemented CI/CD pipelines using Github Actions and Terraform to automate AWS infrastructure deployment, integrating SonarQube for static code analysis to enforce secure coding standards and enhance DevSecOps workflows.',
       technologies: ['AWS', 'Terraform', 'GitHub Actions', 'SonarQube'],
       techColors: ['bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200', 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200', 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200', 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'],
+      githubUrl: 'https://github.com/shumcheyy/portfolio',
+      liveUrl: 'https://resume.securenimbus.cloud/'
+    },
+    {
+      title: 'Web Vulnerabilities Demo Platform',
+      description: 'Interactive learning platform built with Go to demonstrate common web security vulnerabilities including XSS, SQL Injection, CSRF, and more. Designed for educational purposes to help developers understand and prevent security flaws.',
+      technologies: ['Go', 'HTML/CSS', 'JavaScript', 'Security'],
+      techColors: ['bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200', 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200', 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200', 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'],
       githubUrl: '#',
-      liveUrl: '#'
+      liveUrl: 'https://practice.securenimbus.cloud/'
     }
   ];
 

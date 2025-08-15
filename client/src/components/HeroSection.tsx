@@ -2,7 +2,6 @@ import { ShieldQuestion, MapPin, Mail, Phone } from 'lucide-react';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 
 // This component shows the 'About Me' section at the top of the portfolio.
-// It gives a quick summary of who you are and your security background.
 export function HeroSection() {
   return (
     <section id="about" className="animate-fadeIn">

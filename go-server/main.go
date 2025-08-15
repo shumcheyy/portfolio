@@ -60,7 +60,6 @@ func main() {
 	staticDir := getEnv("STATIC_DIR", "./public")
 
 	http.HandleFunc("/api/contact", handleContact)
-	http.HandleFunc("/api/contacts", handleContacts)
 
 	// Serve static files with SPA fallback (secure against path traversal)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -133,18 +132,6 @@ func handleContact(w http.ResponseWriter, r *http.Request) {
 		"success": true,
 		"message": "Message sent successfully",
 		"id":      contact.ID,
-	})
-}
-
-func handleContacts(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	contacts := store.all()
-	respondJSON(w, http.StatusOK, map[string]interface{}{
-		"success":  true,
-		"contacts": contacts,
 	})
 }
 
