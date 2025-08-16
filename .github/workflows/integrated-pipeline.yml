@@ -143,11 +143,11 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
             -d "{\"content\":\":white_check_mark: Deployment succeeded for commit ${{ github.sha }}\"}" \
-            "${{ secrets.DISCORD_WEBHOOK_URL }}"
+            "${{ secrets.DISCORD_WEBHOOK_URL }}/github"
 
       - name: Notify Discord (Failure)
         if: ${{ failure() }}
         run: |
           curl -H "Content-Type: application/json" \
           -d "{\"content\":\":x: Deployment failed for commit ${{ github.sha }}\"}" \
-          "${{ secrets.DISCORD_WEBHOOK_URL }}"
+          "${{ secrets.DISCORD_WEBHOOK_URL }}/github"
