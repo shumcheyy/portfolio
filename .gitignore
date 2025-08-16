@@ -37,10 +37,6 @@ temp/
 .cache
 .npm
 
-# Replit specific (if using Replit)
-.replit
-replit.nix
 
 
 *.bat
-integrated-pipeline.yml.example
