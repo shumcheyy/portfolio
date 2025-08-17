@@ -13,7 +13,7 @@
     # Build the frontend using npm build
     
     WORKDIR /app/client
-    RUN npm install && npm run build
+    RUN npm install && npm run build 
     
     # --- Go build stage ---
     FROM golang:1.24-alpine AS builder
