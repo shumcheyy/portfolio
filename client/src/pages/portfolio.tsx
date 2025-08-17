@@ -39,12 +39,11 @@ export default function Portfolio() {
     setIsMatrixActive(!isMatrixActive);
   };
 
-  // This triggers a download of the resume PDF
+  // This triggers a download of the resume PDF (fallback to direct link)
   const downloadResume = () => {
-    // Create a temporary link to trigger download
-    // In a real implementation, this would point to an actual PDF file
+    // Direct download for now
     const link = document.createElement('a');
-    link.href = '/resume-shubham-choubey.pdf'; // This would be the actual resume file
+    link.href = '/resume-shubham-choubey.pdf';
     link.download = 'Shubham_Choubey_Resume.pdf';
     document.body.appendChild(link);
     link.click();

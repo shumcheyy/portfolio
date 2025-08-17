@@ -12,8 +12,10 @@
     
     # Build the frontend using npm build
     
+    
+    RUN npm install 
     WORKDIR /app/client
-    RUN npm install && npm run build 
+    RUN npm run build 
     
     # --- Go build stage ---
     FROM golang:1.24-alpine AS builder
@@ -26,6 +28,8 @@
     WORKDIR /app
     COPY --from=builder /app/server .
     COPY --from=frontend /app/dist/public ./public
+    # Copy resume file from source (not from frontend stage)
+    COPY client/public/resume-shubham-choubey.pdf ./public/
     ENV PORT=10000
     ENV STATIC_DIR=./public
     EXPOSE 10000

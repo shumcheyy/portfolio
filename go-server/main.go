@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -60,6 +61,7 @@ func main() {
 	staticDir := getEnv("STATIC_DIR", "./public")
 
 	http.HandleFunc("/api/contact", handleContact)
+	// http.HandleFunc("/api/resume", handleResumeDownload) // Temporarily disabled
 
 	// Serve static files with SPA fallback (secure against path traversal)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -139,6 +141,42 @@ func respondJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(data)
+}
+
+func handleResumeDownload(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Analytics: Log download with timestamp and IP
+	clientIP := r.Header.Get("X-Forwarded-For")
+	if clientIP == "" {
+		clientIP = r.Header.Get("X-Real-IP")
+	}
+	if clientIP == "" {
+		clientIP, _, _ = net.SplitHostPort(r.RemoteAddr)
+	}
+
+	log.Printf("Resume downloaded - IP: %s, UserAgent: %s, Referer: %s",
+		clientIP, r.UserAgent(), r.Referer())
+
+	// Set proper headers for PDF download
+	w.Header().Set("Content-Type", "application/pdf")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"Shubham_Choubey_Resume.pdf\"")
+	w.Header().Set("Cache-Control", "public, max-age=3600") // Cache for 1 hour
+
+	// Serve the resume file
+	resumePath := filepath.Join(getEnv("STATIC_DIR", "./public"), "resume-shubham-choubey.pdf")
+
+	// Check if file exists
+	if _, err := os.Stat(resumePath); os.IsNotExist(err) {
+		log.Printf("Resume file not found at: %s", resumePath)
+		http.Error(w, "Resume not found", http.StatusNotFound)
+		return
+	}
+
+	http.ServeFile(w, r, resumePath)
 }
 
 func getEnv(key, fallback string) string {
