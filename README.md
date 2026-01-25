@@ -16,7 +16,7 @@ npm run dev
 
 # Development (Option 2: Full-stack with Go backend)
 npm run build
-xcopy dist\public go-server\public /E /I /Y
+xcopy dist\public go-server\public /E /I /Y 
 cd go-server && go run main.go
 # Visit http://localhost:10000
 ```
